@@ -1,0 +1,2 @@
+# LPiC VSCode extension
+
