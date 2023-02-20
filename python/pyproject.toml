@@ -7,12 +7,13 @@ authors = [
 ]
 dependencies = [
     "pyyaml>=6.0",
+    "pkg @ git+https://github.com/litProgConTeXt/conTeXt-langServer.git@main#subdirectory=python",
 ]
 requires-python = ">=3.10"
 license = {text = "Apache2.0"}
 
 [project.scripts]
-lpic = "lpicLangServer:lpic.cli"
+lpic = "lpicLangServer.lpicCli.cli:cli"
 lpic-langserver = "lpicLangServer:langserver.cli"
 
 [build-system]
@@ -27,4 +28,5 @@ dev = [
     "pytest-asyncio>=0.20.3",
     "aiofiles>=23.1.0",
     "pytest-mock>=3.10.0",
+    "deepdiff>=6.2.3",
 ]
