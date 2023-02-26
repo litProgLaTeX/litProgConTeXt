@@ -3,26 +3,35 @@ import argparse
 import pprint
 import yaml
 
-from .save import saveGrammar
-from .extract import extractFrom
+from contextLangServer.processor.grammar import Grammar
+from contextLangServer.processor.documents import DocumentCache
+#from .extract import extractFrom
 
 def cli() :
 
   argParser  = argparse.ArgumentParser()
-  subParsers = argParser.add_subparsers(dest='subCommand')
-
-  subParser_extract = subParsers.add_parser('extract',
-    help="Extract the embedded code and artifacts")
-  subParser_extract.add_argument('file',
-    help="The base ConTeXt file from which to extract code and artifacts")
-  
-  subParser_saveSyntax = subParsers.add_parser('save',
-    help="Save a full LPiC tmLanguage syntax for use with VScode")
-  subParser_saveSyntax.add_argument('file',
-    help="The path to the new tmLanguage file")
+  argParser.add_argument('filePath',
+    help="The base ConTeXt file to load OR the tmLanguage syntax file to save")
+  argParser.add_argument('--save', action="store_true",
+      help="Save a full tmLanguage syntax for use with VScode")  
   cliArgs = vars(argParser.parse_args())
+  #print(yaml.dump(cliArgs))
+  filePath = cliArgs['filePath']
 
-  if cliArgs['subCommand'] == 'save' : 
-    saveGrammar(cliArgs['file'])
-  elif cliArgs['subCommand'] == 'extract' :
-    extractFrom(cliArgs['file'])
+  Grammar.loadFromResourceDir('contextLangServer.context.syntax')
+  Grammar.loadFromResourceDir('lpicLangServer.lpic.syntax')
+
+  if cliArgs['save'] : 
+    print(f"Saving current syntax to the tmLanguage.json file:\n  {filePath}\n")
+    Grammar.saveToFile(filePath)
+    return
+  
+  print(f"Extracting LPiC code from:\n  {filePath}\n")
+  doc = DocumentCache.loadFromFile(filePath)
+
+  print("---document keys------------------------------------------")
+  print(yaml.dump(list(DocumentCache.documents.keys())))
+  print("---document-----------------------------------------------")
+  print(yaml.dump(doc))
+  print("----------------------------------------------------------")
+
