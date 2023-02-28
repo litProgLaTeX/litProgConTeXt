@@ -10,10 +10,16 @@ from contextLangServer.processor.documents import DocumentCache
 def cli() :
 
   argParser  = argparse.ArgumentParser()
-  argParser.add_argument('filePath',
+  argParser.add_argument('filePath', nargs='?',
     help="The base ConTeXt file to load OR the tmLanguage syntax file to save")
-  argParser.add_argument('--save', action="store_true",
-      help="Save a full tmLanguage syntax for use with VScode")  
+  argParser.add_argument('--save', metavar="base.scope", default='',
+      help="Save a full tmLanguage syntax for use with VScode")
+  argParser.add_argument('--check', metavar="base.scope", default='',
+    help="Check the loaded grammar for missing and extra patterns"
+  )
+  argParser.add_argument('--prune', action='store_true',
+    help="Prune unused patterns from grammar"
+  )
   cliArgs = vars(argParser.parse_args())
   #print(yaml.dump(cliArgs))
   filePath = cliArgs['filePath']
@@ -22,8 +28,37 @@ def cli() :
   Grammar.loadFromResourceDir('lpicLangServer.lpic.syntax')
 
   if cliArgs['save'] : 
-    print(f"Saving current syntax to the tmLanguage.json file:\n  {filePath}\n")
-    Grammar.saveToFile(filePath)
+    if cliArgs['prune'] :
+      Grammar.pruneRepository(cliArgs['save'])
+    if Grammar.savedToFile(cliArgs['save'], filePath) :
+      print(f"Saved current syntax to the tmLanguage.json file:\n  {filePath}\n")
+    else :
+      print(f"base.scope [{cliArgs['save']}] not found in grammar\n")
+    return
+  
+  if cliArgs['check'] :
+    prunedPatterns = []
+    if cliArgs['prune'] :
+      prunedPatterns = Grammar.pruneRepository(cliArgs['check'])
+    missingPatterns, extraPatterns, patternReferences = Grammar.checkRepository(cliArgs['check'])
+    print("")
+    print("--missing patterns-----------------------------------------------")
+    if missingPatterns : print(yaml.dump(missingPatterns))
+    else : print("")
+    print("--extra patterns-------------------------------------------------")
+    if extraPatterns : print(yaml.dump(extraPatterns))
+    else : print("")
+    if prunedPatterns :
+      print("--pruned patterns------------------------------------------------")
+      print(yaml.dump(prunedPatterns))
+    print("--patterns-------------------------------------------------------")
+    if patternReferences : print(yaml.dump(patternReferences))
+    else : print("")
+    print("-----------------------------------------------------------------")
+    return
+
+  if filePath == None :
+    print("You MUST specify a filePath when extracting LPiC code")
     return
   
   print(f"Extracting LPiC code from:\n  {filePath}\n")
