@@ -20,6 +20,12 @@ def cli() :
   argParser.add_argument('--prune', action='store_true',
     help="Prune unused patterns from grammar"
   )
+  argParser.add_argument('--scopePaths', action='store_true',
+    help="List the scopePaths found in the current grammar"
+  )
+  argParser.add_argument('--onlyActions', action='store_true',
+    help="Limit the scope paths to those with loaded actions"
+  )
   cliArgs = vars(argParser.parse_args())
   #print(yaml.dump(cliArgs))
   filePath = cliArgs['filePath']
@@ -55,6 +61,15 @@ def cli() :
     if patternReferences : print(yaml.dump(patternReferences))
     else : print("")
     print("-----------------------------------------------------------------")
+    return
+
+  if cliArgs['scopePaths'] :
+    withAction = False
+    if cliArgs['onlyActions'] : withAction = True
+    scopePaths = Grammar.collectScopePaths(withAction=withAction)
+    print("---scope paths---------------------------------------------")
+    print(yaml.dump(scopePaths))
+    print("----------------------------------------------------------")
     return
 
   if filePath == None :
