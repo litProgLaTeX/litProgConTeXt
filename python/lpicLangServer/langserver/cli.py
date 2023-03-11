@@ -6,7 +6,7 @@ import yaml
 
 import contextLangServer.langserver.ls1_lifeCycle
 import contextLangServer.langserver.lsA_build
-import lpicLangServer.ls1_lifeCycle
+import lpicLangServer.langserver.ls1_lifeCycle
 
 from contextLangServer.langserver.simpleJsonRpc import (
   asyncWrapStdinStdout, AsyncJsonRpc

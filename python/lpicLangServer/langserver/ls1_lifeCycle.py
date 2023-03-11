@@ -17,21 +17,20 @@ async def initialize(disp, ctx, params, kwargs) :
     disp.debugIO.write("lsRequest: initialize\n")
   
   # load the python project description
-  here = os.path.abspath(__file__) # python/contextLangServer/langserver/ls1_lifeCycle.py
-  #here = os.path.dirname(here)     # python/contextLangServer/langserver
-  #here = os.path.dirname(here)     # python/contextLangServer
-  #here = os.path.dirname(here)     # python
+  here = os.path.abspath(__file__) # python/lpicLangServer/langserver/ls1_lifeCycle.py
+  here = os.path.dirname(here)     # python/lpicLangServer/langserver
+  here = os.path.dirname(here)     # python/lpicLangServer
+  here = os.path.dirname(here)     # python
   prjDict = {}
-  #with open(os.path.join(here, 'pyproject.toml')) as tomlFile :
-  #  prjDict = tomllib.loads(tomlFile.read())
+  with open(os.path.join(here, 'pyproject.toml')) as tomlFile :
+    prjDict = tomllib.loads(tomlFile.read())
   version = 'unknown'
   if prjDict : version = prjDict['project']['version']
 
   # return our capabilities
   return {
-    'here' : here,
     'serverInfo' : {
-      'name'    : "ConTeXtLS",
+      'name'    : "LPiC-LS",
       'version' : version
     }
   }
