@@ -1,3 +1,4 @@
+tests/ansic/build
 .pdm.toml
 
 # Byte-compiled / optimized / DLL files
