@@ -23,21 +23,39 @@ nl::json jsonEcho::JsonEcho::execute_request_impl(
     bool allowStdIn  
 ) {
 
-  nl::json publicData;
-  publicData["text/plain"] = "Hello world!";
-  publish_execution_result(
-    executionCounter,
-    std::move(publicData),
-    nl::json::object()
-  );
-  return xeus::create_successful_reply();
+  auto errorType = "Unknown";
+  auto errorMsg = std::stringstream();
+  try {
 
-  // publish_execution_error(
-  //  "TypeError",
-  //  "aMessage",
-  //  "errorTraceBack"
-  //)
-  // return xeus::create_error_reply();
+    nl::json jData = nl::json::parse(code);
+
+    nl::json publicData;
+    publicData["text/plain"] = jData.dump(2);
+    publish_execution_result(
+      executionCounter,
+      std::move(publicData),
+      nl::json::object()
+    );
+    return xeus::create_successful_reply();
+
+  } catch ( nl::json::parse_error& err ) {
+    errorType = "Parse Error";
+    errorMsg << "Parsing at: " << err.byte << std::endl;
+    errorMsg << err.what() << std::endl;
+  } catch ( std::exception& err ) {
+    errorType = "General Error";
+    errorMsg << err.what() << std::endl;
+  } catch (...) {
+    errorType = "Unknonwn Error";
+    errorMsg << "Unknown erorr!" << std::endl ;
+  }
+
+  publish_execution_error(
+    errorType,
+    errorMsg.str(),
+    nl::json::array()
+  );
+  return xeus::create_error_reply();
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -68,7 +86,16 @@ nl::json jsonEcho::JsonEcho::inspect_request_impl(
 nl::json jsonEcho::JsonEcho::is_complete_request_impl(
   const std::string& code
 ) {
-  return xeus::create_is_complete_reply("complete");
+  try {
+
+    nl::json jData = nl::json::parse(code);
+
+    return xeus::create_is_complete_reply("complete");
+  } catch ( nl::json::parse_error& err ) {
+    return xeus::create_is_complete_reply("incomplete");
+  } catch (...) {
+  }  
+  return xeus::create_is_complete_reply("invalid");
 }
 
 ////////////////////////////////////////////////////////////////////////////

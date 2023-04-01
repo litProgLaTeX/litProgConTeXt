@@ -59,7 +59,7 @@ build local/include/xtl/xhash.hpp : make_install xtl/CMakeLists.txt
 
 cFlags = -Wall
 includeFlags = -I local/include
-linkFlags = -L local/lib
+linkFlags = -L local/lib -lcrypto -lsodium -luuid
 
 rule cc
   command = g++ $cFlags $includeFlags -c $in -o $out
@@ -77,4 +77,7 @@ build main.o : cc ../xeus-json/src/main.cpp | $
   local/include/xeus/xkernel_configuration.hpp $
   local/include/xeus-zmq/xserver_zmq.hpp
 
-build jsonEchoKernel : link main.o jsonEcho.o local/lib/libxeus.so local/lib/libxeus-zmq.so local/lib/libzmq.so
+build jsonEchoKernel : link main.o jsonEcho.o $
+  local/lib/libxeus-zmq.a $
+  local/lib/libxeus.a $
+  local/lib/libzmq.a
