@@ -49,3 +49,10 @@ inputs, the packages are always downloaded.
 
 To prevent this repeated downloading, we explicitly separate the download phase
 and the build phase.
+
+## Testing
+
+We use
+[jupyter_kernel_test](https://github.com/jupyter/jupyter_kernel_test) to
+provide a simple external test of our jupyter kernel.
+
