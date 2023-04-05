@@ -27,11 +27,13 @@ def cli() :
     help="Limit the scope paths to those with loaded actions"
   )
   cliArgs = vars(argParser.parse_args())
-  #print(yaml.dump(cliArgs))
+  print(yaml.dump(cliArgs))
   filePath = cliArgs['filePath']
 
   Grammar.loadFromResourceDir('contextLangServer.context.syntax')
   Grammar.loadFromResourceDir('lpicLangServer.lpic.syntax')
+
+  Grammar.dumpGrammar()
 
   if cliArgs['save'] : 
     if cliArgs['prune'] :
